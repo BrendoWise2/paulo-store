@@ -6,27 +6,23 @@ export async function POST(req: Request) {
         const { email, password } = await req.json();
 
         const service = new AuthUserService();
-        const auth = await service.execute({ email, password });
+        const { token, user } = await service.execute({ email, password });
 
-        // Salva token em cookie httpOnly
-        const res = NextResponse.json(
-            { id: auth.id, name: auth.name, email: auth.email, role: auth.role },
-            { status: 200 }
-        );
+        const response = NextResponse.json(user);
 
-        res.cookies.set("token", auth.token, {
+        response.cookies.set("auth_token", token, {
             httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
             sameSite: "lax",
             path: "/",
-            // secure: true, // ligue em produção HTTPS
             maxAge: 60 * 60 * 24 * 30, // 30 dias
         });
 
-        return res;
+        return response;
     } catch (e: any) {
         return NextResponse.json(
-            { error: "Bad Request", message: e.message ?? "Erro no login" },
-            { status: 400 }
+            { message: e.message ?? "Erro ao autenticar" },
+            { status: 401 }
         );
     }
 }

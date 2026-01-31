@@ -11,42 +11,44 @@ export class AuthUserService {
     async execute({ email, password }: AuthRequest) {
         const user = await prisma.user.findUnique({
             where: { email },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                password: true,
-                role: true,
-                emailVerified: true,
-                companyId: true,
-            },
         });
 
-        if (!user) throw new Error("User/Password incorrect");
-        if (!user.emailVerified) {
-            throw new Error("E-mail não verificado. Verifique sua caixa de entrada.");
+        if (!user) {
+            throw new Error("Email ou senha inválidos");
         }
 
+        //VERIFICAR EMAIL DEPOIS
+        /* if (!user.emailVerified) {
+             throw new Error("E-mail ainda não verificado");
+         }*/
+
         const passwordMatch = await compare(password, user.password);
-        if (!passwordMatch) throw new Error("User/Password incorrect");
+
+        if (!passwordMatch) {
+            throw new Error("Email ou senha inválidos");
+        }
 
         const token = sign(
             {
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                companyId: user.companyId,
             },
             process.env.JWT_SECRET!,
-            { subject: user.id, expiresIn: "30d" }
+            {
+                subject: user.id,
+                expiresIn: "30d",
+            }
         );
 
         return {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
             token,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            },
         };
     }
 }
