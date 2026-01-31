@@ -1,0 +1,140 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id       String @id @default(uuid())
+  name     String
+  email    String @unique
+  password String
+  role     Role
+
+  emailVerified     Boolean @default(false)
+  verificationToken String?
+
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  enrollments  Enrollment[]
+  examAttempts ExamAttempt[]
+  certificates Certificate[]
+
+  @@map("users")
+}
+
+model Company {
+  id       String  @id @default(uuid())
+  name     String
+  cnpj     String  @unique
+  isActive Boolean @default(true)
+
+  users       User[]
+  enrollments Enrollment[]
+
+  createdAt DateTime @default(now())
+
+  @@map("companies")
+}
+
+model Book {
+  id          String  @id @default(uuid())
+  title       String
+  description String?
+  pdfUrl      String
+  coverImage  String?
+
+  exams       Exam[]
+  enrollments Enrollment[]
+
+  createdAt    DateTime      @default(now())
+  certificates Certificate[]
+
+  @@map("books")
+}
+
+model Enrollment {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  bookId String
+  book   Book   @relation(fields: [bookId], references: [id])
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  released Boolean @default(true)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, bookId])
+  @@map("enrollments")
+}
+
+model Exam {
+  id     String @id @default(uuid())
+  bookId String
+  book   Book   @relation(fields: [bookId], references: [id])
+
+  title     String
+  passScore Int
+
+  attempts ExamAttempt[]
+
+  @@map("exams")
+}
+
+model ExamAttempt {
+  id String @id @default(uuid())
+
+  examId String
+  exam   Exam   @relation(fields: [examId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  score  Int
+  passed Boolean
+
+  createdAt DateTime @default(now())
+
+  @@map("exam_attempts")
+}
+
+model Certificate {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  bookId String
+  book   Book   @relation(fields: [bookId], references: [id])
+
+  pdfUrl String
+
+  issuedAt DateTime @default(now())
+
+  @@unique([userId, bookId])
+  @@map("certificates")
+}
+
+enum Role {
+  SUPER_ADMIN
+  COMPANY_ADMIN
+  USER
+}
