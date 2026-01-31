@@ -5,12 +5,12 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -18,7 +18,7 @@ model User {
   name     String
   email    String @unique
   password String
-  role     Role
+  role     Role   @default(USER)
 
   emailVerified     Boolean @default(false)
   verificationToken String?
@@ -78,7 +78,7 @@ model Enrollment {
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
-  released Boolean @default(true)
+  isApproved Boolean @default(false)
 
   createdAt DateTime @default(now())
 
