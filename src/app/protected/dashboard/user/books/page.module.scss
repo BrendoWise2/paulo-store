@@ -177,3 +177,23 @@
         }
     }
 }
+
+.sortSelect {
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--text);
+    font-size: 0.9rem;
+
+    &:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--focus);
+    }
+}
+
+/* Ajuste pro seu .green funcionar */
+.green {
+    color: var(--primary);
+}

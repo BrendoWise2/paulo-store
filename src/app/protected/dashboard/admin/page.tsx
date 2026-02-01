@@ -1,3 +1,70 @@
-export default function SuperDashboard() {
-    return <h1>Dashboard SUPER_ADMIN</h1>;
+import Link from "next/link";
+import styles from "./page.module.scss";
+import { requireRole } from "@/lib/auth";
+
+export default async function AdminDashboardPage() {
+    const payload = await requireRole(["SUPER_ADMIN", "COMPANY_ADMIN"]);
+
+    return (
+        <div className={styles.page}>
+            <header className={styles.header}>
+                <div className={styles.headerContent}>
+                    <div className={styles.brand}>
+                        <div className={styles.logoDot} />
+                        <div>
+                            <h1 className={styles.title}>Dashboard Admin</h1>
+                            <p className={styles.subtitle}>
+                                {payload.role === "SUPER_ADMIN" ? "Admin" : "Empresa"}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className={styles.right}>
+                        <span className={styles.user}>
+                            {payload.name ?? "Admin"} • {payload.email ?? ""}
+                        </span>
+                        <Link className={styles.btnGhost} href="/protected/dashboard/user/books">
+                            Ver como usuário
+                        </Link>
+                    </div>
+                </div>
+            </header>
+
+            <main className={styles.container}>
+                <section className={styles.grid}>
+                    <Link className={styles.card} href="/protected/dashboard/admin/approvals">
+                        <div className={styles.cardIcon}>✅</div>
+                        <div className={styles.cardBody}>
+                            <h2>Aprovações</h2>
+                            <p>Aprovar acesso de usuários aos livros.</p>
+                        </div>
+                    </Link>
+
+                    <Link className={styles.card} href="/protected/dashboard/admin/books/new">
+                        <div className={styles.cardIcon}>📘</div>
+                        <div className={styles.cardBody}>
+                            <h2>Cadastrar livro</h2>
+                            <p>Criar novos livros e disponibilizar PDF.</p>
+                        </div>
+                    </Link>
+
+                    <Link className={styles.card} href="/protected/dashboard/admin/companies">
+                        <div className={styles.cardIcon}>🏢</div>
+                        <div className={styles.cardBody}>
+                            <h2>Empresas</h2>
+                            <p>Gerenciar empresas (para demo pode ser simples).</p>
+                        </div>
+                    </Link>
+
+                    <Link className={styles.card} href="/protected/dashboard/admin/users">
+                        <div className={styles.cardIcon}>👤</div>
+                        <div className={styles.cardBody}>
+                            <h2>Usuários</h2>
+                            <p>Listar usuários e vincular empresa.</p>
+                        </div>
+                    </Link>
+                </section>
+            </main>
+        </div>
+    );
 }
