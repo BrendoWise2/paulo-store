@@ -1,0 +1,179 @@
+.cartilhasPage {
+    min-height: 100vh;
+    background-color: var(--bg);
+    font-family: "Inter", sans-serif;
+    color: var(--text);
+}
+
+/* ===== HEADER ===== */
+.header {
+    background: var(--card);
+    box-shadow: 0 6px 24px rgba(18, 20, 49, 0.06);
+    padding: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    border-bottom: 1px solid var(--border);
+
+    .headerContent {
+        max-width: 1280px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            cursor: pointer;
+
+            .green {
+                color: var(--primary);
+            }
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            font-size: 0.9rem;
+
+            span {
+                color: var(--muted);
+                cursor: pointer;
+                transition: 0.2s;
+
+                &:hover {
+                    color: var(--primary-dark);
+                }
+            }
+
+            .searchBox {
+                position: relative;
+
+                input {
+                    background: var(--primary-soft);
+                    border: 1px solid var(--border);
+                    padding: 0.55rem 2rem 0.55rem 0.75rem;
+                    border-radius: 10px;
+                    width: 14rem;
+                    transition: 0.3s;
+                    color: var(--text);
+
+                    &:focus {
+                        outline: none;
+                        border-color: var(--primary);
+                        box-shadow: 0 0 0 3px var(--focus);
+                    }
+                }
+
+                svg {
+                    position: absolute;
+                    right: 0.6rem;
+                    top: 0.55rem;
+                    width: 18px;
+                    height: 18px;
+                    color: var(--muted);
+                }
+            }
+        }
+    }
+}
+
+/* ===== GRID ===== */
+.gridContainer {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 1.8rem;
+}
+
+/* ===== CARD ===== */
+.card {
+    background: var(--card);
+    border-radius: 1.1rem;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+
+    &:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 22px 55px rgba(18, 20, 49, 0.18);
+
+        img {
+            transform: scale(1.06);
+            filter: brightness(0.9);
+        }
+
+        .overlay {
+            opacity: 1;
+            visibility: visible;
+        }
+    }
+
+    .imageContainer {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.4s ease;
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(64, 70, 163, 0.55);
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s ease;
+
+            span {
+                background: var(--primary);
+                color: #fff;
+                padding: 0.65rem 1.6rem;
+                border-radius: 9999px;
+                font-weight: 600;
+                font-size: 0.95rem;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            }
+        }
+    }
+
+    .cardContent {
+        padding: 1.2rem;
+
+        .cardTitle {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--primary-dark);
+            margin-bottom: 0.6rem;
+            text-align: center;
+            background: var(--primary-soft);
+            border-radius: 9999px;
+            padding: 0.35rem 0.75rem;
+        }
+
+        .cardAuthor {
+            font-size: 0.9rem;
+            color: var(--muted);
+            text-align: center;
+        }
+    }
+}

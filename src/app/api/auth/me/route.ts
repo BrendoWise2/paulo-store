@@ -1,24 +1,20 @@
 import { NextResponse } from "next/server";
-import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getAuthUserId } from "@/lib/auth";
 
 export async function GET() {
     try {
-        const { payload } = requireAuth();
+        const userId = await getAuthUserId();
 
         const user = await prisma.user.findUnique({
-            where: { id: payload.sub },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                role: true,
-                companyId: true,
-            },
+            where: { id: userId },
+            select: { id: true, name: true, email: true, role: true, companyId: true },
         });
+
+        if (!user) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
         return NextResponse.json(user);
     } catch (e: any) {
-        return NextResponse.json({ message: e.message }, { status: 401 });
+        return NextResponse.json({ message: e?.message ?? "Unauthorized" }, { status: 401 });
     }
 }

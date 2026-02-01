@@ -29,7 +29,8 @@ export default function LoginPage() {
             return;
         }
 
-        router.push("/dashboard");
+        router.push("/protected/dashboard");
+        router.refresh();
     }
 
     return (
