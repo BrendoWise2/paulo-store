@@ -1,34 +1,42 @@
 import { cookies } from "next/headers";
 import { verify } from "jsonwebtoken";
 
-type JwtPayload = {
+export type JwtPayload = {
     sub: string;
-    role: "SUPER_ADMIN" | "COMPANY_ADMIN" | "USER";
-    companyId?: string | null;
-    name?: string;
     email?: string;
+    role?: "SUPER_ADMIN" | "COMPANY_ADMIN" | "USER";
+    name?: string;
 };
 
-export async function getAuth() {
-    const token = (await cookies()).get("token")?.value;
-    if (!token) return null;
+export async function getAuthPayload(): Promise<JwtPayload> {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("auth_token")?.value;
 
-    try {
-        const payload = verify(token, process.env.JWT_SECRET!) as JwtPayload;
-        return { token, payload };
-    } catch {
-        return null;
+    if (!token) {
+        throw new Error("Unauthorized");
     }
+
+    return verify(token, process.env.JWT_SECRET!) as JwtPayload;
 }
 
-export function requireAuth() {
-    const auth = getAuth();
-    if (!auth) throw new Error("Não autenticado");
-    return auth;
+export async function getAuthUserId(): Promise<string> {
+    const payload = await getAuthPayload();
+
+    if (!payload.sub) {
+        throw new Error("Unauthorized");
+    }
+
+    return payload.sub;
 }
 
-export function requireRole(allowed: JwtPayload["role"][]) {
-    const { payload } = requireAuth();
-    if (!allowed.includes(payload.role)) throw new Error("Sem permissão");
+export async function requireRole(
+    roles: Array<JwtPayload["role"]>
+): Promise<JwtPayload> {
+    const payload = await getAuthPayload();
+
+    if (!payload.role || !roles.includes(payload.role)) {
+        throw new Error("Forbidden");
+    }
+
     return payload;
 }
