@@ -2,26 +2,13 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole, getAuthPayload } from "@/lib/auth";
 
-async function readEnrollmentId(req: Request): Promise<string | null> {
-    const contentType = req.headers.get("content-type") ?? "";
-
-    if (contentType.includes("application/json")) {
-        const body = await req.json().catch(() => null);
-        return body?.enrollmentId ?? null;
-    }
-
-    // ✅ form submit
-    const form = await req.formData().catch(() => null);
-    const val = form?.get("enrollmentId");
-    return typeof val === "string" ? val : null;
-}
-
 export async function POST(req: Request) {
     try {
         await requireRole(["SUPER_ADMIN", "COMPANY_ADMIN"]);
         const payload = await getAuthPayload();
 
-        const enrollmentId = await readEnrollmentId(req);
+        const body = await req.json();
+        const { enrollmentId } = body as { enrollmentId: string };
 
         if (!enrollmentId) {
             return NextResponse.json({ message: "enrollmentId is required" }, { status: 400 });
@@ -29,32 +16,29 @@ export async function POST(req: Request) {
 
         const enrollment = await prisma.enrollment.findUnique({
             where: { id: enrollmentId },
-            select: { id: true, companyId: true, isApproved: true },
+            select: { id: true, companyId: true },
         });
 
         if (!enrollment) {
             return NextResponse.json({ message: "Enrollment not found" }, { status: 404 });
         }
 
-        // Empresa só aprova o que é dela
         if (payload.role === "COMPANY_ADMIN") {
             const me = await prisma.user.findUnique({
                 where: { id: payload.sub },
                 select: { companyId: true },
             });
-
             if (!me?.companyId || me.companyId !== enrollment.companyId) {
                 return NextResponse.json({ message: "Forbidden" }, { status: 403 });
             }
         }
 
-        await prisma.enrollment.update({
+        const updated = await prisma.enrollment.update({
             where: { id: enrollmentId },
-            data: { isApproved: true },
+            data: { isApproved: false },
         });
 
-        // ✅ se veio de <form>, redireciona de volta (melhor UX)
-        return NextResponse.redirect(new URL("/protected/dashboard/company/approvals", req.url));
+        return NextResponse.json(updated, { status: 200 });
     } catch (e: any) {
         const msg = e?.message ?? "Erro";
         const status = msg === "Unauthorized" ? 401 : msg === "Forbidden" ? 403 : 400;

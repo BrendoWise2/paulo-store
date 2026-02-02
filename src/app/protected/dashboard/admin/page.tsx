@@ -52,7 +52,7 @@ export default async function AdminDashboardPage() {
                         <div className={styles.cardIcon}>🏢</div>
                         <div className={styles.cardBody}>
                             <h2>Empresas</h2>
-                            <p>Gerenciar empresas (para demo pode ser simples).</p>
+                            <p>Gerenciar empresas.</p>
                         </div>
                     </Link>
 
