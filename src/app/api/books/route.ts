@@ -4,8 +4,8 @@ import { requireRole } from "@/lib/auth";
 
 export async function POST(req: Request) {
     try {
-        // ✅ Só SUPER_ADMIN ou COMPANY_ADMIN cria livro (ajuste como quiser)
-        await requireRole(["SUPER_ADMIN", "COMPANY_ADMIN"]);
+        // ✅ Só SUPER_ADMIN cria livro
+        await requireRole(["SUPER_ADMIN"]);
 
         const body = await req.json();
         const { title, pdfUrl, description, coverImage } = body;

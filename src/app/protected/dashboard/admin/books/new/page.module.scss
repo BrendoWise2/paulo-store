@@ -1,0 +1,242 @@
+.page {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 10px 30px rgba(18, 20, 49, 0.06);
+}
+
+.headerContent {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.1rem 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.title {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--primary-dark);
+}
+
+.subtitle {
+    margin: 0.35rem 0 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+.actionsTop {
+    display: flex;
+    gap: 10px;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.2rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 16px;
+}
+
+.previewCard,
+.formCard {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.previewHead {
+    padding: 1rem 1rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--primary-soft);
+}
+
+.previewTitle {
+    font-weight: 900;
+    color: var(--primary-dark);
+}
+
+.previewHint {
+    margin-top: 4px;
+    font-size: 0.9rem;
+    color: var(--muted);
+}
+
+.previewFrame {
+    padding: 12px;
+}
+
+.previewImg {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--primary-soft);
+}
+
+.previewMeta {
+    padding: 0.9rem 1rem 1rem;
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 8px 10px;
+    border-top: 1px solid var(--border);
+}
+
+.previewMetaLabel {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.previewMetaValue {
+    font-weight: 800;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    a {
+        color: var(--primary-dark);
+        text-decoration: none;
+        font-weight: 900;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+.form {
+    padding: 1rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+
+    label {
+        font-size: 0.9rem;
+        font-weight: 800;
+        color: var(--primary-dark);
+    }
+
+    input,
+    textarea {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 0.85rem 0.95rem;
+        outline: none;
+        background: #fff;
+        color: var(--text);
+        transition: box-shadow 0.12s ease, border-color 0.12s ease;
+
+        &:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--focus);
+        }
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+}
+
+.errorBox {
+    background: rgba(231, 75, 90, 0.12);
+    border: 1px solid rgba(231, 75, 90, 0.25);
+    color: var(--accent-red);
+    font-weight: 800;
+    border-radius: 14px;
+    padding: 0.8rem 0.9rem;
+    margin: 10px 0 12px;
+}
+
+.formActions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding-top: 6px;
+}
+
+.btnPrimary,
+.btnGhost {
+    border: none;
+    border-radius: 999px;
+    padding: 0.65rem 1rem;
+    font-weight: 900;
+    cursor: pointer;
+    transition: transform 0.12s ease, opacity 0.12s ease;
+}
+
+.btnPrimary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+
+    &:hover {
+        opacity: 0.95;
+        transform: translateY(-1px);
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+}
+
+.btnGhost {
+    background: rgba(111, 121, 216, 0.10);
+    color: var(--primary-dark);
+    border: 1px solid rgba(111, 121, 216, 0.22);
+
+    &:hover {
+        transform: translateY(-1px);
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+}
+
+@media (max-width: 980px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .previewImg {
+        height: 220px;
+    }
+
+    .formActions {
+        justify-content: stretch;
+
+        button {
+            flex: 1;
+        }
+    }
+}
