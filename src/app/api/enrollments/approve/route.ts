@@ -10,10 +10,14 @@ async function readEnrollmentId(req: Request): Promise<string | null> {
         return body?.enrollmentId ?? null;
     }
 
-    // ✅ form submit
     const form = await req.formData().catch(() => null);
     const val = form?.get("enrollmentId");
     return typeof val === "string" ? val : null;
+}
+
+function isFormRequest(req: Request) {
+    const ct = req.headers.get("content-type") ?? "";
+    return ct.includes("application/x-www-form-urlencoded") || ct.includes("multipart/form-data");
 }
 
 export async function POST(req: Request) {
@@ -22,21 +26,20 @@ export async function POST(req: Request) {
         const payload = await getAuthPayload();
 
         const enrollmentId = await readEnrollmentId(req);
-
         if (!enrollmentId) {
             return NextResponse.json({ message: "enrollmentId is required" }, { status: 400 });
         }
 
         const enrollment = await prisma.enrollment.findUnique({
             where: { id: enrollmentId },
-            select: { id: true, companyId: true, isApproved: true },
+            select: { id: true, companyId: true },
         });
 
         if (!enrollment) {
             return NextResponse.json({ message: "Enrollment not found" }, { status: 404 });
         }
 
-        // Empresa só aprova o que é dela
+        // COMPANY_ADMIN só aprova da própria empresa
         if (payload.role === "COMPANY_ADMIN") {
             const me = await prisma.user.findUnique({
                 where: { id: payload.sub },
@@ -48,13 +51,19 @@ export async function POST(req: Request) {
             }
         }
 
-        await prisma.enrollment.update({
+        const updated = await prisma.enrollment.update({
             where: { id: enrollmentId },
             data: { isApproved: true },
         });
 
-        // ✅ se veio de <form>, redireciona de volta (melhor UX)
-        return NextResponse.redirect(new URL("/protected/dashboard/company/approvals", req.url));
+        // ✅ Se for <form> no browser: redirect (melhor UX)
+        if (isFormRequest(req)) {
+            const back = req.headers.get("referer") ?? "/protected/dashboard/company/approvals";
+            return NextResponse.redirect(new URL(back), { status: 303 });
+        }
+
+        // ✅ Se for API (Insomnia/fetch): JSON
+        return NextResponse.json(updated, { status: 200 });
     } catch (e: any) {
         const msg = e?.message ?? "Erro";
         const status = msg === "Unauthorized" ? 401 : msg === "Forbidden" ? 403 : 400;

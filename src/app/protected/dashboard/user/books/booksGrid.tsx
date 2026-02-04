@@ -122,7 +122,7 @@ export default function BooksClient() {
                         {filtered.map((b, index) => (
                             <a
                                 key={b.id}
-                                href={b.pdfUrl}
+                                href={`/api/books/${b.id}/pdf`}
                                 target="_blank"
                                 rel="noreferrer"
                                 className={styles.card}
@@ -130,10 +130,7 @@ export default function BooksClient() {
                             >
                                 <div className={styles.imageContainer}>
                                     <img
-                                        src={
-                                            b.coverImage ||
-                                            "https://placehold.co/400x300/EEF0FF/4046A3?text=SEM+CAPA"
-                                        }
+                                        src={`/api/books/${b.id}/cover`}
                                         alt={b.title}
                                         className={styles.cardImage}
                                         onError={(e) => {
@@ -149,19 +146,18 @@ export default function BooksClient() {
 
                                 <div className={styles.cardContent}>
                                     <h3 className={styles.cardTitle}>{b.title}</h3>
-                                    {b.description ? (
-                                        <p className={styles.cardDesc}>{b.description}</p>
-                                    ) : null}
+                                    {b.description ? <p className={styles.cardDesc}>{b.description}</p> : null}
                                     <p className={styles.cardDate}>
-                                        Adicionado em:{" "}
-                                        {new Date(b.createdAt).toLocaleDateString("pt-BR")}
+                                        Adicionado em: {new Date(b.createdAt).toLocaleDateString("pt-BR")}
                                     </p>
                                 </div>
                             </a>
+
                         ))}
                     </div>
-                )}
-            </main>
-        </div>
+                )
+                }
+            </main >
+        </div >
     );
 }

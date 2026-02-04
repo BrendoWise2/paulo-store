@@ -1,12 +1,11 @@
-import { ReactNode } from "react";
-import { getAuthPayload } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { requireRole } from "@/lib/auth";
 
-export default async function ProtectedLayout({ children }: { children: ReactNode }) {
+export default async function Layout({ children }: { children: React.ReactNode }) {
     try {
-        await getAuthPayload();
-        return children;
+        await requireRole(["COMPANY_ADMIN"]);
     } catch {
         redirect("/login");
     }
+    return <>{children}</>;
 }
