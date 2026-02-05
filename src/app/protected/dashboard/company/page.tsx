@@ -40,7 +40,7 @@ export default async function AdminDashboardPage() {
                         </div>
                     </Link>
 
-                    <Link className={styles.card} href="/protected/dashboard/admin/books/new">
+                    <Link className={styles.card} href="/protected/dashboard/company/books/new">
                         <div className={styles.cardIcon}>📘</div>
                         <div className={styles.cardBody}>
                             <h2>Solicitar Treinamentos e Mentoria</h2>
@@ -56,7 +56,7 @@ export default async function AdminDashboardPage() {
                         </div>
                     </Link>
 
-                    <Link className={styles.card} href="/protected/dashboard/admin/users">
+                    <Link className={styles.card} href="/protected/dashboard/company/collaborators">
                         <div className={styles.cardIcon}>👤</div>
                         <div className={styles.cardBody}>
                             <h2>Colaboradores</h2>

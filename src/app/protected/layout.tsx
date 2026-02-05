@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
-import { requireRole } from "@/lib/auth";
+import { getAuthPayload } from "@/lib/auth";
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
     try {
-        await requireRole(["COMPANY_ADMIN"]);
+        await getAuthPayload(); // apenas verifica autenticação, não papel
     } catch {
         redirect("/login");
     }
