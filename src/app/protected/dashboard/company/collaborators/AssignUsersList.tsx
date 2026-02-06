@@ -6,12 +6,19 @@ type User = { id: string; name: string | null; email: string | null; companyId?:
 type Book = { id: string; title: string };
 type Company = { id: string; name: string; cnpj?: string };
 
-export default function AssignUsersList({ users: initialUsers, books, companyId, companies }: { users: User[]; books: Book[]; companyId?: string; companies?: Company[] }) {
+export default function AssignUsersList({ users: initialUsers, books, initialBookOptions, companyId, companies }: { users: User[]; books: Book[]; initialBookOptions?: Record<string, Book[]>; companyId?: string; companies?: Company[] }) {
     const [users, setUsers] = useState<User[]>(initialUsers);
     const [loading, setLoading] = useState<string | null>(null);
     const [selected, setSelected] = useState<Record<string, string>>({});
     const [selectedCompany, setSelectedCompany] = useState<string | undefined>(companyId ?? companies?.[0]?.id);
     const [showForm, setShowForm] = useState(false);
+    const [bookOptions, setBookOptions] = useState<Record<string, Book[]>>(() => {
+        const map: Record<string, Book[]> = {};
+        initialUsers.forEach((u) => {
+            map[u.id] = initialBookOptions?.[u.id] ?? books.map((b) => ({ ...b }));
+        });
+        return map;
+    });
 
     const handleAssign = async (userId: string) => {
         const bookId = selected[userId] ?? books[0]?.id;
@@ -32,8 +39,16 @@ export default function AssignUsersList({ users: initialUsers, books, companyId,
                 const err = await res.json().catch(() => ({ message: "Erro" }));
                 alert(err.message || "Erro ao vincular");
             } else {
-                // remover usuário da lista
-                setUsers((s) => s.filter((u) => u.id !== userId));
+                // remover apenas o livro atribuído das opções desse usuário
+                setBookOptions((prev) => {
+                    const next = { ...prev };
+                    const current = next[userId] ?? books.map((b) => ({ ...b }));
+                    const updated = current.filter((b) => b.id !== bookId);
+                    next[userId] = updated;
+                    // atualizar selected para o próximo livro disponível (ou vazio)
+                    setSelected((s) => ({ ...s, [userId]: updated[0]?.id ?? "" }));
+                    return next;
+                });
             }
         } catch (e) {
             alert("Erro ao vincular");
@@ -73,7 +88,10 @@ export default function AssignUsersList({ users: initialUsers, books, companyId,
                     companyId={companyId}
                     companies={companies}
                     onClose={() => setShowForm(false)}
-                    onCreate={(u) => setUsers((s) => [u as User, ...s])}
+                    onCreate={(u) => {
+                        setUsers((s) => [u as User, ...s]);
+                        setBookOptions((prev) => ({ ...prev, [u.id]: books.map((b) => ({ ...b })) }));
+                    }}
                 />
             )}
 
@@ -100,8 +118,8 @@ export default function AssignUsersList({ users: initialUsers, books, companyId,
                                 <div style={{ color: "var(--muted)", fontSize: 14 }}>{u.email ?? "-"}</div>
 
                                 <div>
-                                    <select value={selected[u.id] ?? (books[0]?.id ?? "")} onChange={(e) => setSelected((s) => ({ ...s, [u.id]: e.target.value }))} style={{ padding: "8px", borderRadius: 8 }}>
-                                        {books.map((b) => (
+                                    <select value={selected[u.id] ?? (bookOptions[u.id]?.[0]?.id ?? "")} onChange={(e) => setSelected((s) => ({ ...s, [u.id]: e.target.value }))} style={{ padding: "8px", borderRadius: 8 }}>
+                                        {(bookOptions[u.id] ?? books).map((b) => (
                                             <option key={b.id} value={b.id}>
                                                 {b.title}
                                             </option>
@@ -110,9 +128,13 @@ export default function AssignUsersList({ users: initialUsers, books, companyId,
                                 </div>
 
                                 <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-                                    <button disabled={loading === u.id} onClick={() => handleAssign(u.id)} style={{ border: "none", borderRadius: 999, padding: "0.55rem 0.9rem", fontWeight: 800, cursor: "pointer", background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", color: "white" }}>
-                                        {loading === u.id ? "Vinculando..." : "Vincular"}
-                                    </button>
+                                    {(bookOptions[u.id] ?? books).length === 0 ? (
+                                        <div style={{ color: "var(--muted)", fontWeight: 700 }}>Todos vinculados</div>
+                                    ) : (
+                                        <button disabled={loading === u.id} onClick={() => handleAssign(u.id)} style={{ border: "none", borderRadius: 999, padding: "0.55rem 0.9rem", fontWeight: 800, cursor: "pointer", background: "linear-gradient(135deg, var(--primary), var(--primary-dark))", color: "white" }}>
+                                            {loading === u.id ? "Vinculando..." : "Vincular"}
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ))}

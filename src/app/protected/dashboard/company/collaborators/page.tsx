@@ -35,6 +35,18 @@ export default async function CompanyCollaboratorsPage({ }: Props) {
     // buscar empresas apenas para SUPER_ADMIN (para permitir escolher a empresa ao vincular)
     const companies = me?.role === "SUPER_ADMIN" ? await prisma.company.findMany({ select: { id: true, name: true, cnpj: true }, orderBy: { name: "asc" } }) : undefined;
 
+    // buscar enrollments existentes para os usuários listados para excluir livros já vinculados
+    const userIds = users.map((u) => u.id);
+    const enrollments = userIds.length
+        ? await prisma.enrollment.findMany({ where: { userId: { in: userIds } }, select: { userId: true, bookId: true } })
+        : [];
+
+    const initialBookOptions: Record<string, { id: string; title: string }[]> = {};
+    for (const u of users) {
+        const enrolledBookIds = new Set(enrollments.filter((e) => e.userId === u.id).map((e) => e.bookId));
+        initialBookOptions[u.id] = books.filter((b) => !enrolledBookIds.has(b.id));
+    }
+
     return (
         <div className={styles.page}>
             <header className={styles.header}>
@@ -47,7 +59,7 @@ export default async function CompanyCollaboratorsPage({ }: Props) {
             <main className={styles.container}>
                 {/* Sempre renderiza o componente cliente para permitir criar usuários mesmo quando a lista estiver vazia */}
                 {/* @ts-ignore Server -> Client serialização */}
-                <AssignUsersList users={users} books={books} companyId={me.companyId ?? undefined} companies={companies} />
+                <AssignUsersList users={users} books={books} initialBookOptions={initialBookOptions} companyId={me.companyId ?? undefined} companies={companies} />
             </main>
         </div>
     );
