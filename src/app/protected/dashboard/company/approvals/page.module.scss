@@ -194,11 +194,44 @@
     align-self: start;
 }
 
+.cardCompact {
+    max-width: 520px;
+    margin: 0 auto;
+    width: 100%;
+}
+
 .cardHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 14px 16px;
+}
+
+.cardContentCentered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 24px;
+    text-align: center;
+}
+
+.cardIcon {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(99, 102, 241, 0.04));
+    margin-bottom: 12px;
+    font-size: 26px;
+}
+
+.cardTitle {
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--text);
 }
 
 .headerActions {
