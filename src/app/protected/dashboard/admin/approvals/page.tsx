@@ -1,4 +1,5 @@
 import styles from "./page.module.scss";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -52,15 +53,15 @@ export default async function AdminApprovalsPage({ searchParams }: Props) {
                     <p className={styles.subtitle}>Aprove ou reprove acessos</p>
 
                     <div className={styles.filters}>
-                        <a className={status === "pending" ? styles.active : ""} href="?status=pending">
+                        <Link className={status === "pending" ? styles.active : ""} href={{ pathname: ".", query: { status: "pending" } }}>
                             Pendentes ({pendingCount})
-                        </a>
-                        <a className={status === "approved" ? styles.active : ""} href="?status=approved">
+                        </Link>
+                        <Link className={status === "approved" ? styles.active : ""} href={{ pathname: ".", query: { status: "approved" } }}>
                             Aprovados ({approvedCount})
-                        </a>
-                        <a className={status === "all" ? styles.active : ""} href="?status=all">
+                        </Link>
+                        <Link className={status === "all" ? styles.active : ""} href={{ pathname: ".", query: { status: "all" } }}>
                             Todos ({allCount})
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </header>
