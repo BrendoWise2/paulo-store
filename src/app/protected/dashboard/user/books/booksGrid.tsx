@@ -122,9 +122,7 @@ export default function BooksClient() {
                         {filtered.map((b, index) => (
                             <a
                                 key={b.id}
-                                href={`/api/books/${b.id}/pdf`}
-                                target="_blank"
-                                rel="noreferrer"
+                                href={`/protected/dashboard/user/books/${b.id}`}
                                 className={styles.card}
                                 style={{ ["--i" as any]: index }}
                             >
@@ -161,3 +159,4 @@ export default function BooksClient() {
         </div >
     );
 }
+

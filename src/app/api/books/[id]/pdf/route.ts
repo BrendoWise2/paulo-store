@@ -39,7 +39,26 @@ export async function GET(
             secure: true,
         });
 
-        return NextResponse.redirect(signedUrl);
+        const upstream = await fetch(signedUrl, { cache: "no-store" });
+
+        if (!upstream.ok) {
+            return NextResponse.json(
+                { message: "Erro ao obter PDF" },
+                { status: upstream.status }
+            );
+        }
+
+        const pdfBuffer = await upstream.arrayBuffer();
+        const fileName = `${bookId}.pdf`;
+
+        return new NextResponse(pdfBuffer, {
+            status: 200,
+            headers: {
+                "Content-Type": "application/pdf",
+                "Content-Disposition": `inline; filename=\"${fileName}\"`,
+                "Cache-Control": "private, no-store",
+            },
+        });
     } catch (e: any) {
         const msg = e?.message ?? "Erro";
         const status = msg === "Unauthorized" ? 401 : 400;
